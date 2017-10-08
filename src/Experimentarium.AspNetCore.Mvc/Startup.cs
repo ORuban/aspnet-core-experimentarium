@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +36,19 @@ namespace Experimentarium.AspNetCore.Mvc
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            // If add this then WelcomePage middleware will fail with System.InvalidOperationException: 
+            // Headers are read-only, response has already started.
+            //
+            // app.Use(async (context,next) => {
+            //     await context.Response.WriteAsync("Custom MiddleWare");
+            //     await next.Invoke();
+            // });
+
+            app.UseWelcomePage( new WelcomePageOptions()
+            {
+                Path = "/welcome"
+            });
 
             app.UseStaticFiles();
 
