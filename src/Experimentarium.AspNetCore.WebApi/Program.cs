@@ -7,6 +7,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -14,7 +16,23 @@ namespace Experimentarium.AspNetCore.WebApi
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            Log.Logger = CreateSerilogLogger();
+
+            try
+            {
+                Log.Information("Starting web host");
+
+                BuildWebHost(args).Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+                return;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IWebHost BuildWebHost(string[] args)
@@ -35,9 +53,21 @@ namespace Experimentarium.AspNetCore.WebApi
                           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
                 })
                 .UseStartup<Startup>()
+                .UseSerilog()
                 .Build();
 
             return webHost;
+        }
+
+        // Look into https://github.com/serilog/serilog-aspnetcore
+        private static Serilog.ILogger CreateSerilogLogger()
+        {
+            return new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
         }
     }
 }
