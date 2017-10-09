@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Json;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -67,6 +68,8 @@ namespace Experimentarium.AspNetCore.WebApi
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("serilog/webApi.plain.log")
+                .WriteTo.File(new JsonFormatter(), "serilog/webApi.json.log")
                 .CreateLogger();
         }
     }
