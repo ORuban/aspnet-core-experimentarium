@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <!-- Enable/disable Razor View compilation -->
+    <!-- Where precompiled Views lcoated: publish output folder -> <project_name>.PrecompiledViews.dll -->
+    <!-- https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?tabs=aspnetcore2x -->
+    <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
   </PropertyGroup>
 
   <ItemGroup>
