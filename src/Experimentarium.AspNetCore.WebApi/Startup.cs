@@ -16,9 +16,11 @@ namespace Experimentarium.AspNetCore.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private ILogger _logger;
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -49,8 +51,12 @@ namespace Experimentarium.AspNetCore.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime)
         {
+            applicationLifetime.ApplicationStarted.Register(() => _logger.LogInformation("App started"));
+            applicationLifetime.ApplicationStopping.Register(() => _logger.LogInformation("App stopping"));
+            applicationLifetime.ApplicationStopped.Register(() => _logger.LogInformation("App stopped"));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
