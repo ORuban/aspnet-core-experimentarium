@@ -65,6 +65,11 @@ namespace Experimentarium.AspNetCore.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseResponseCompression();
+
+            ExperimentsWithMiddlewareRegistration(app);
+
+            app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             // https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio
@@ -76,12 +81,6 @@ namespace Experimentarium.AspNetCore.WebApi
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Experimentarium API V1");
             });
-
-            app.UseResponseCompression();
-
-            ExperimentsWithMiddlewareRegistration(app);
-
-            app.UseMvc();
         }
 
         private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
