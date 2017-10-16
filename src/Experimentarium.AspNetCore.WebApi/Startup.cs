@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Experimentarium.AspNetCore.WebApi.ConfigurationExperiment;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -62,6 +63,10 @@ namespace Experimentarium.AspNetCore.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            // The same middleware could be registered any times.
+            // Without adding a separate exptension method, you can register a middleware by .UseMiddleware method:
+            // app.UseMiddleware<EmptyMiddleware>();
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             // https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio
             app.UseSwagger();
@@ -73,7 +78,48 @@ namespace Experimentarium.AspNetCore.WebApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Experimentarium API V1");
             });
 
+            app.UseResponseCompression();
+
+            ExperimentsWithMiddlewareRegistration(app);
+
             app.UseMvc();
+        }
+
+        private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
+        {
+            app.Map("middleware/map1", HandleMapTest1);
+            
+            #region HttpContext Items
+
+            app.Use(async (context, next) =>
+            {
+                context.Items["item1"] = "value_one";
+
+                // Do work that doesn't write to the Response.
+                await next.Invoke();
+                // Do logging or other work that doesn't write to the Response.
+            });
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Items.ContainsKey("item1"))
+                {
+
+                }
+                await next.Invoke();
+            });
+
+            #endregion HttpContext Items
+
+            app.UseEmptyMiddleware();
+        }
+
+        private static void HandleMapTest1(IApplicationBuilder app)
+        {
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("Map Test 1");
+            });
         }
     }
 }
