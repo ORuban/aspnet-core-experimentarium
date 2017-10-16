@@ -65,9 +65,6 @@ namespace Experimentarium.AspNetCore.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            // The same middleware could be registered any times.
-            // Without adding a separate exptension method, you can register a middleware by .UseMiddleware method:
-            // app.UseMiddleware<EmptyMiddleware>();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             // https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?tabs=visual-studio
@@ -114,6 +111,9 @@ namespace Experimentarium.AspNetCore.WebApi
             #endregion HttpContext Items
 
             app.UseEmptyMiddleware();
+            // The same middleware could be registered any times.
+            // Without adding a separate exptension method, you can register a middleware by .UseMiddleware method:
+            // app.UseMiddleware<EmptyMiddleware>();
         }
 
         private static void HandleMapTest1(IApplicationBuilder app)
