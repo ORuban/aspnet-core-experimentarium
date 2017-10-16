@@ -89,7 +89,7 @@ namespace Experimentarium.AspNetCore.WebApi
 
         private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
         {
-            app.Map("middleware/map1", HandleMapTest1);
+            app.Map("/middleware/map1", HandleMapTest1);
             
             #region HttpContext Items
 
