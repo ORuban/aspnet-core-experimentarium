@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -33,20 +36,26 @@ namespace Experimentarium.AspNetCore.WebApi
 
             services.Configure<MyOptions>(Configuration.GetSection("MyOptions"));
 
+            services.AddResponseCompression();
+
+            services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
             services.AddMvc();
 
-            services.AddResponseCompression();
+            services.AddApiVersioning(o => o.ReportApiVersions = true);
 
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { 
-                    Title = "Experimentarium API V1", 
-                    Version = "v1", 
-                    Description = "Different experiments with ASP.NET Core Web API",
-                    TermsOfService = "None",
-                    Contact = new Contact(){ Url = "https://github.com/ORuban/aspnet-core-experimentarium" }
-                    });
+                // resolve the IApiVersionDescriptionProvider service
+                // note: that we have to build a temporary service provider here because one has not been created yet
+                var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+
+                // add a swagger document for each discovered API version
+                // note: you might choose to skip or document deprecated API versions differently
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    c.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));
+                }
 
                 c.IgnoreObsoleteActions();
                 c.IgnoreObsoleteProperties();
@@ -54,7 +63,7 @@ namespace Experimentarium.AspNetCore.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime, IApiVersionDescriptionProvider provider)
         {
             applicationLifetime.ApplicationStarted.Register(() => _logger.LogInformation("App started"));
             applicationLifetime.ApplicationStopping.Register(() => _logger.LogInformation("App stopping"));
@@ -77,10 +86,15 @@ namespace Experimentarium.AspNetCore.WebApi
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             // By default available by /swagger endpoint
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Experimentarium API V1");
-            });
+            app.UseSwaggerUI(
+                options =>
+                {
+                    // build a swagger endpoint for each discovered API version
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    }
+                });
         }
 
         private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
@@ -121,6 +135,25 @@ namespace Experimentarium.AspNetCore.WebApi
             {
                 await context.Response.WriteAsync("Map Test 1");
             });
+        }
+
+        private static Info CreateInfoForApiVersion(ApiVersionDescription description)
+        {
+            var info = new Info()
+            {
+                Title = "Experimentarium API {description.ApiVersion}",
+                Version = description.ApiVersion.ToString(),
+                Description = "Different experiments with ASP.NET Core Web API",
+                TermsOfService = "None",
+                Contact = new Contact() { Url = "https://github.com/ORuban/aspnet-core-experimentarium" }
+            };
+
+            if (description.IsDeprecated)
+            {
+                info.Description += " This API version has been deprecated.";
+            }
+
+            return info;
         }
     }
 }
