@@ -41,7 +41,13 @@ namespace Experimentarium.AspNetCore.WebApi
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
             services.AddMvc();
 
-            services.AddApiVersioning(o => o.ReportApiVersions = true);
+            // https://www.hanselman.com/blog/ASPNETCoreRESTfulWebAPIVersioningMadeEasy.aspx
+            services.AddApiVersioning(options => {
+                options.ReportApiVersions = true;
+                //By default without specifying api-version the ApiVersionUnspecified error occurres, so:
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(2,0);
+            });
 
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
