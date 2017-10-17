@@ -15,6 +15,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Experimentarium.AspNetCore.WebApi.Controllers;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -47,6 +49,9 @@ namespace Experimentarium.AspNetCore.WebApi
                 //By default without specifying api-version the ApiVersionUnspecified error occurres, so:
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.DefaultApiVersion = new ApiVersion(2,0);
+
+                options.Conventions.Controller<VersionController>().HasApiVersion(new ApiVersion(1, 0));
+                options.Conventions.Controller<VersionController>().HasApiVersion(new ApiVersion(2, 0));
             });
 
             // Register the Swagger generator, defining one or more Swagger documents
