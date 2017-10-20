@@ -110,7 +110,7 @@ namespace Experimentarium.AspNetCore.WebApi
 
         private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
         {
-            app.Map("/middleware/map1", HandleMapTest1);
+            app.Map("/middleware/hello", HandleMapHelloWorld);
             
             #region HttpContext Items
 
@@ -140,11 +140,11 @@ namespace Experimentarium.AspNetCore.WebApi
             // app.UseMiddleware<EmptyMiddleware>();
         }
 
-        private static void HandleMapTest1(IApplicationBuilder app)
+        private static void HandleMapHelloWorld(IApplicationBuilder app)
         {
             app.Run(async context =>
             {
-                await context.Response.WriteAsync("Map Test 1");
+                await context.Response.WriteAsync("Hello World!");
             });
         }
 
