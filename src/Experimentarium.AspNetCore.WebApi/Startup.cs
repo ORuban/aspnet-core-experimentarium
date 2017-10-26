@@ -23,12 +23,14 @@ namespace Experimentarium.AspNetCore.WebApi
     public class Startup
     {
         private ILogger _logger;
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IHostingEnvironment env, IConfiguration configuration, ILogger<Startup> logger)
         {
+            Environment = env;
             Configuration = configuration;
             _logger = logger;
         }
 
+        public IHostingEnvironment Environment { get; set; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -74,13 +76,13 @@ namespace Experimentarium.AspNetCore.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime applicationLifetime, IApiVersionDescriptionProvider provider)
+        public void Configure(IApplicationBuilder app, IApplicationLifetime applicationLifetime, IApiVersionDescriptionProvider provider)
         {
             applicationLifetime.ApplicationStarted.Register(() => _logger.LogInformation("App started"));
             applicationLifetime.ApplicationStopping.Register(() => _logger.LogInformation("App stopping"));
             applicationLifetime.ApplicationStopped.Register(() => _logger.LogInformation("App stopped"));
 
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
