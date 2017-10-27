@@ -11,7 +11,7 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
     [ApiVersion("1.0")]
     public class TokenExperimentController : Controller
     {
-        [Authorize("JWTSampleSchema")]
+        [Authorize(AuthenticationSchemes = "JWTSampleSchema")]
         [HttpGet("/experiment/token/details")]
         public IActionResult TokenDetails()
         {
@@ -47,7 +47,7 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
         [ApiVersion("2.0")]
         public class TokenExperimentControllerV2 : Controller
         {
-            [Authorize("JWTSampleSchema")]
+            [Authorize(AuthenticationSchemes = "JWTSampleSchema")]
             [HttpGet("/experiment/token/details")]
             public IActionResult TokenDetails()
             {
