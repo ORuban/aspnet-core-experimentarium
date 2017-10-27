@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Experimentarium.AspNetCore.WebApi.ConfigurationExperiment;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,14 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Experimentarium.AspNetCore.WebApi.Controllers;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -37,6 +30,13 @@ namespace Experimentarium.AspNetCore.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
+
+            services.AddAuthentication(options =>
+            {
+                //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJWTExperiment(Environment);
 
             services.Configure<MyOptions>(Configuration.GetSection("MyOptions"));
 
@@ -86,6 +86,8 @@ namespace Experimentarium.AspNetCore.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAuthentication();
 
             app.UseResponseCompression();
 
