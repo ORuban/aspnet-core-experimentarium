@@ -43,22 +43,23 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
 
             return jwtToken;
         }
+    }
 
-        [ApiVersion("2.0")]
-        public class TokenExperimentControllerV2 : Controller
+    [ApiVersion("2.0")]
+    public class TokenExperimentControllerV2 : Controller
+    {
+        [Authorize(AuthenticationSchemes = "JWTSampleSchema")]
+        [HttpGet("/experiment/token/details")]
+        public dynamic TokenDetails()
         {
-            [Authorize(AuthenticationSchemes = "JWTSampleSchema")]
-            [HttpGet("/experiment/token/details")]
-            public IActionResult TokenDetails()
-            {
-                return Ok();
-            }
+            return Ok();
+        }
 
-            [HttpGet("/experiment/token")]
-            public string CreateToken([FromQuery] string name = "John Doe", [FromQuery] string mail = "e-mail@test.com")
+        [HttpGet("/experiment/token")]
+        public string CreateToken([FromQuery] string name = "John Doe", [FromQuery] string mail = "e-mail@test.com")
+        {
+            var claims = new Claim[]
             {
-                var claims = new Claim[]
-                {
                 new Claim(JwtRegisteredClaimNames.NameId, name),
                 new Claim(JwtRegisteredClaimNames.Email, mail),
                 new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
@@ -66,16 +67,15 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
                 new Claim(JwtRegisteredClaimNames.Aud, "Any client of this app"),
                 new Claim(JwtRegisteredClaimNames.Iss, "Experimentarium.AspNetCore App"),
                 new Claim("custom_claim", "custom data")
-                };
+            };
 
-                var token = new JwtSecurityToken(
-                    new JwtHeader(new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("the secret that needs to be at least 16 characters long for HmacSha256")),
-                                                 SecurityAlgorithms.HmacSha256)),
-                    new JwtPayload(claims));
+            var token = new JwtSecurityToken(
+                new JwtHeader(new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes("the secret that needs to be at least 16 characters long for HmacSha256")),
+                                             SecurityAlgorithms.HmacSha256)),
+                new JwtPayload(claims));
 
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            }
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
