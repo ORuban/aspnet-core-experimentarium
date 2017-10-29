@@ -10,6 +10,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
 using Experimentarium.AspNetCore.WebApi.Controllers;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -86,6 +87,11 @@ namespace Experimentarium.AspNetCore.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            var option = new RewriteOptions();
+            option.AddRedirect("^$", "swagger");
+
+            app.UseRewriter(option);
 
             app.UseAuthentication();
 
