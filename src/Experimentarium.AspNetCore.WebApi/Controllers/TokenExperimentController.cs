@@ -18,6 +18,7 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet("/experiment/token")]
         public string CreateToken([FromQuery] string name = "John Doe", [FromQuery] string mail = "e-mail@test.com")
         {
@@ -55,6 +56,7 @@ namespace Experimentarium.AspNetCore.WebApi.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet("/experiment/token")]
         public string CreateToken([FromQuery] string name = "John Doe", [FromQuery] string mail = "e-mail@test.com")
         {
