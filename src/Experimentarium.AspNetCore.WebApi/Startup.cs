@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
 using Experimentarium.AspNetCore.WebApi.Controllers;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.FileProviders;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -92,6 +93,17 @@ namespace Experimentarium.AspNetCore.WebApi
             option.AddRedirect("^$", "swagger");
 
             app.UseRewriter(option);
+
+            var staticFileOptions = new StaticFileOptions()
+            {
+                DefaultContentType = "text/plain",
+                ServeUnknownFileTypes = true,
+
+                RequestPath = "/static",
+                FileProvider = new PhysicalFileProvider(System.IO.Path.Combine(Environment.WebRootPath, "static_content")),
+            };
+
+            app.UseStaticFiles(staticFileOptions);
 
             app.UseAuthentication();
 
