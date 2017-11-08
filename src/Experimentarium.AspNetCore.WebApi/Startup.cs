@@ -49,11 +49,12 @@ namespace Experimentarium.AspNetCore.WebApi
             services.AddMvc();
 
             // https://www.hanselman.com/blog/ASPNETCoreRESTfulWebAPIVersioningMadeEasy.aspx
-            services.AddApiVersioning(options => {
+            services.AddApiVersioning(options =>
+            {
                 options.ReportApiVersions = true;
                 //By default without specifying api-version the ApiVersionUnspecified error occurres, so:
                 options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(2,0);
+                options.DefaultApiVersion = new ApiVersion(2, 0);
 
                 options.Conventions.Controller<VersionController>().HasApiVersion(new ApiVersion(1, 0));
                 options.Conventions.Controller<VersionController>().HasApiVersion(new ApiVersion(2, 0));
@@ -144,7 +145,7 @@ namespace Experimentarium.AspNetCore.WebApi
         private static void ExperimentsWithMiddlewareRegistration(IApplicationBuilder app)
         {
             app.Map("/middleware/hello", HandleMapHelloWorld);
-            
+
             #region HttpContext Items
 
             app.Use(async (context, next) =>
