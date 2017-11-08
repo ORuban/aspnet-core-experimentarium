@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Experimentarium.AspNetCore.WebApi.Controllers;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Net.Http.Headers;
 
 namespace Experimentarium.AspNetCore.WebApi
 {
@@ -101,6 +102,16 @@ namespace Experimentarium.AspNetCore.WebApi
 
                 RequestPath = "/static",
                 FileProvider = new PhysicalFileProvider(System.IO.Path.Combine(Environment.WebRootPath, "static_content")),
+
+                OnPrepareResponse = ctx =>
+                {
+                    var headers = ctx.Context.Response.GetTypedHeaders();
+                    headers.CacheControl = new CacheControlHeaderValue
+                    {
+                        MaxAge = TimeSpan.FromDays(365)
+                    };
+                }
+
             };
 
             app.UseStaticFiles(staticFileOptions);
